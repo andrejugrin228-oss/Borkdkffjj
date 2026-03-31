@@ -1,0 +1,36 @@
+import asyncio
+import random
+from aiogram import Bot, Dispatcher, types
+from aiogram.utils import executor
+
+# Твой токен
+API_TOKEN = '8518666721:AAFjlkgawunRGRsS00DUKzjJ7Phxw0xZYzg'
+
+bot = Bot(token=API_TOKEN)
+dp = Dispatcher(bot)
+
+kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
+kb.add(types.KeyboardButton('🚀 Получить сигнал'))
+kb.add(types.KeyboardButton('👤 Профиль'), types.KeyboardButton('📢 Канал'))
+
+users = {}
+
+@dp.message_handler(commands=['start'])
+async def start(message: types.Message):
+    await message.answer("🤖 **HACK_AVIATOR v2.0 запущен.**\n\nВведите ваш **ID 1win**.", reply_markup=kb, parse_mode="Markdown")
+
+@dp.message_handler(lambda m: m.text == '🚀 Получить сигнал')
+async def get_signal(message: types.Message):
+    if message.from_user.id not in users:
+        await message.answer("❌ Сначала введите свой ID!")
+        return
+    val = round(random.uniform(1.2, 3.9), 2)
+    await message.answer(f"✅ **СИГНАЛ: {val}x**", parse_mode="Markdown")
+
+@dp.message_handler(lambda m: m.text.isdigit() and len(m.text) >= 7)
+async def register(message: types.Message):
+    users[message.from_user.id] = message.text
+    await message.answer(f"✅ ID {message.text} привязан!")
+
+if __name__ == '__main__':
+    executor.start_polling(dp, skip_updates=True)
